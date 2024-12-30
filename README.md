@@ -1,7 +1,6 @@
 # TCGAimmunosurv
 # Project Overview
-
-This is the code repository of [HistoSPACE](https://www.sciencedirect.com/science/article/pii/S1046202324002391) paper, please follow the paper for more details. The input data includes the ICIAR dataset and spatial transcriptomics data used in the ST-NET paper.
+TCGAimmunosurv, which combines mutation-specific survival and single-cell trajectory analyses.
 
 ## Required Libraries
 To ensure the package works correctly, install the following libraries (if your environment doesn't consist the following libraries):
