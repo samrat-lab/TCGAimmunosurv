@@ -34,8 +34,8 @@ R Console
 source(functions.R)
 ```
 
-2. eample_breast_cd8tcell.R
+2. example_breast_cd8tcell.R
 
-This file contains the eecution the functions for the analysis.
+This file contains the execution of the functions for the analysis.
 
 Execution: Run the commands sequential wise to reproduce the results and User can also use for the other cancer types.
