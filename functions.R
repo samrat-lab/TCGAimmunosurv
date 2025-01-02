@@ -1201,13 +1201,17 @@ mapping_genes <- function(deg_results, gene_metadata_dt, logFC_threshold, padj_t
   return(selected_genes)
 }
 
-#' Extract Significant Genes with Hazard Ratio Greater Than 1
+#' Extract Significant Genes with Hazard Ratio Greater Than 1 and Save to CSV
 #'
-#' This function filters significant genes with a hazard ratio (HR) greater than 1 from
-#' a given results DataFrame. It returns a DataFrame of the filtered genes and their hazard ratios.
+#' This function filters significant genes with a hazard ratio (HR) greater than 1 
+#' from a given results DataFrame. It returns a DataFrame of the filtered genes 
+#' and their hazard ratios and saves the results to a `.csv` file.
 #'
-#' @param results A DataFrame containing gene analysis results with at least the following columns:
-#'                \code{significant}, \code{hazard_ratio}, and \code{gene_name}.
+#' @param results A DataFrame containing gene analysis results with at least 
+#'                the following columns: \code{significant}, \code{hazard_ratio}, 
+#'                and \code{gene_name}.
+#' @param output_file Character. The name of the output `.csv` file to save 
+#'                    the results. Default is "significant_genes.csv".
 #' @return A DataFrame with two columns:
 #'         \itemize{
 #'           \item \code{gene_name}: Names of significant genes with HR > 1.
@@ -1224,10 +1228,10 @@ mapping_genes <- function(deg_results, gene_metadata_dt, logFC_threshold, padj_t
 #'   hazard_ratio = c(1.5, 0.8, 2.3, 0.6)
 #' )
 #'
-#' # Extract significant genes with HR > 1
-#' significant_genes <- extract_genes_hr_gt1(results)
+#' # Extract significant genes with HR > 1 and save to a CSV file
+#' significant_genes <- extract_genes_hr_gt1(results, output_file = "filtered_genes.csv")
 #' print(significant_genes)
-extract_genes_hr_gt1 <- function(results) {
+extract_genes_hr_gt1 <- function(results, output_file = "significant_genes.csv") {
   if (!all(c("significant", "hazard_ratio", "gene_name") %in% colnames(results))) {
     stop("The input DataFrame must contain 'significant', 'hazard_ratio', and 'gene_name' columns.")
   }
@@ -1236,6 +1240,9 @@ extract_genes_hr_gt1 <- function(results) {
   significant_genes <- results %>%
     filter(significant == "Yes" & hazard_ratio > 1) %>%
     select(gene_name, hazard_ratio)
+
+  # Save the filtered results to a CSV file
+  write.csv(significant_genes, file = output_file, row.names = FALSE)
 
   return(significant_genes)
 }
