@@ -182,10 +182,6 @@ selected_genes <- mapping_genes(
   padj_threshold = 0.05
 )
 
-#for exporting the genes survival related
-export_hr_counts_to_csv(results)
-
-
 
 ####################################### Single-cell Analysis function usage #################################################
 
