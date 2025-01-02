@@ -1567,8 +1567,8 @@ plot_cd8_trajectory <- function(cds, cd8_tcells, color_by_pseudotime = TRUE, lab
 #'
 #' @import monocle3
 #' @export
-run_graph_test <- function(cds) {
-  result <- graph_test(cds)
+run_graph_test <- function(cds, neighbor_graph, cores) {
+  result <- graph_test(cdscds, neighbor_graph = neighbor_graph, cores = cores)
   return(result)
 }
 
