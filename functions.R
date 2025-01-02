@@ -1572,3 +1572,54 @@ run_graph_test <- function(cds, neighbor_graph, cores) {
   return(result)
 }
 
+#' Get Top Combined Ranked Genes and Save to CSV
+#'
+#' This function identifies the top genes based on a combined rank of 
+#' q-values and Moran's I statistic from spatial transcriptomics analysis,
+#' and saves the results to a `.csv` file.
+#'
+#' @param graph_test_res A data frame containing gene statistics, 
+#' including `q_value` (adjusted p-value) and `morans_I` (Moran's I statistic).
+#' @param q_value_threshold Numeric. The threshold for significant q-values. 
+#' Default is 0.05.
+#' @param top_n Integer. The number of top genes to return based on the 
+#' combined rank. Default is 10.
+#' @param output_file Character. The name of the output `.csv` file to save 
+#' the results. Default is "top_genes.csv".
+#'
+#' @return A character vector containing the names of the top-ranked genes.
+#'
+#' @details
+#' The function filters genes based on the `q_value_threshold`, then combines 
+#' the ranks of `q_value` (ascending order) and `morans_I` (descending order). 
+#' The combined rank is used to determine the top `top_n` genes. 
+#' The top genes and their ranks are saved to a `.csv` file.
+#'
+#' @examples
+#' # Example usage:
+#' # Assuming `graph_test_res` is a data frame with columns `q_value` and `morans_I`
+#' top_genes <- get_top_combined_genes(graph_test_res, q_value_threshold = 0.05, 
+#'                                     top_n = 10, output_file = "top_genes.csv")
+#' print(top_genes)
+#'
+#' @export
+get_top_combined_genes <- function(graph_test_res, q_value_threshold = 0.05, top_n = 10, output_file = "top_genes.csv") {
+  # Subset significant genes based on q_value threshold
+  significant_genes <- subset(graph_test_res, q_value < q_value_threshold)
+  
+  # Add a rank column combining ranks of q_value and Moran's I
+  significant_genes$rank <- rank(significant_genes$q_value) + rank(-significant_genes$morans_I)
+  
+  assign("significant_genes", significant_genes, envir = .GlobalEnv)
+  
+  # Order by combined rank and extract the top genes
+  top_combined_genes <- significant_genes[order(significant_genes$rank), ]
+  top_combined_genes <- top_combined_genes[1:top_n, ]
+  
+  # Save the top genes to a CSV file
+  write.csv(top_combined_genes, file = output_file, row.names = TRUE)
+  
+  # Return the names of the top-ranked genes
+  return(rownames(top_combined_genes))
+}
+
