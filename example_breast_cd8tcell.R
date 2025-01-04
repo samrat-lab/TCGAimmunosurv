@@ -1,4 +1,4 @@
-setwd("/media/dev/New_Volume/PhD_Work/TCGAimmunosurv")
+setwd("path to TCGA data in RData format")
 ####################### Load the Packages ###############################
 library(TCGAbiolinks)
 library(survival)
@@ -183,6 +183,7 @@ selected_genes <- mapping_genes(
 
 
 ####################################### Single-cell Analysis function usage #################################################
+setwd("path to Single-cell RNA-Seq data in .rds format")
 
 seurat_obj <- load_seurat_object(directory, selected_cancer = selected_cancer)
 
