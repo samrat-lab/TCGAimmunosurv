@@ -1,0 +1,30 @@
+Package: TCGAimmunosurv
+Title: Mutation-specific Survival Analysis and Immune Cell Transitions
+Version: 1.0
+Authors@R: c(
+    person("Devvrat", "Pandey", email="pandey.devvrat@thsti.res.in", role = c("aut","cre")),
+    person("Shivam", "Kumar", role = c("ctb", "aut")),
+    person("Dipanka", "Tanu-Sarmah", role = c("ctb", "aut")),
+    person("Samrat", "chatterjee", role = c("aut","ctb")))
+Maintainer: Devvrat Pandey <pandey.devvrat@thsti.res.in>
+Description: ‘TCGAimmunosurv’, for the integrated analysis of bulk and single-cell RNA-Seq data across pan-cancer studies. This package facilitates a deeper understanding of cancer immune dynamics in the context of specific oncogene mutations. Key features of this package include mutation-specific survival analysis, pseudotime trajectory analysis, identification of differentially expressed genes, and comprehensive insights into mutations within cancers or specific genes.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: R(>= 4.4.0), maftools, TimeSeriesExperiment
+Imports: Seurat, SeuratWrappers, SummarizedExperiment, DESeq2,
+        survival, survminer, ggplot2, dplyr, data.table, stringr,
+        utils, monocle3, TCGAbiolinks, kableExtra, Matrix, gridExtra,
+        stats, methods
+Remotes: satijalab/seurat-wrappers, cole-trapnell-lab/monocle3,
+        bioinformaticsFMRP/TCGAbiolinks, satijalab/seurat,
+        PoisonAlien/maftools, thelovelab/DESeq2, Bioconductor/Rhtslib,
+        nlhuong/TimeSeriesExperiment
+Suggests: BiocManager, knitr, rmarkdown
+NeedsCompilation: no
+Packaged: 2025-02-17 06:33:04 UTC; system
+Author: Devvrat Pandey [aut, cre],
+  Shivam Kumar [ctb, aut],
+  Dipanka Tanu-Sarmah [ctb, aut],
+  Samrat chatterjee [aut, ctb]
