@@ -26,7 +26,11 @@ The project requires the data of Bulk RNA-seq and Single-cell RNAseq saved as .R
 
 After downloading the file, configure the paths in your script accordingly.
 
-## File Descriptions and Execution
+## Execution
+Please download the data by using the above link and stored it in your working directory. 
+###Note: This is important
+
+## File Descriptions
 
 1. example_breast_cd8tcell.R
 
