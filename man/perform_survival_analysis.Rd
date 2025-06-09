@@ -23,7 +23,7 @@ A data frame with the results of the survival analysis for each gene, including:
 \item \code{gene_name}: The name of the gene.
 \item \code{hazard_ratio}: The hazard ratio for the gene.
 \item \code{pvalue}: The p-value from the Cox regression for the gene.
-\item \code{significant}: Whether the gene is significantly associated with survival (p-value \leq 0.05).
+\item \code{significant}: Whether the gene is significantly associated with survival (p-value ≤ 0.05).
 }
 }
 \description{

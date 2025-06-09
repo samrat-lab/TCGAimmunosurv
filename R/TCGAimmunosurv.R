@@ -634,6 +634,7 @@ perform_survival_analysis <- function(count_matrix_filtered, gene_metadata_dt, c
   return(results)
 }
 
+<<<<<<< HEAD
 #' Survival Analysis with Permutation Test for Robust Gene Selection
 #'
 #' This function performs survival analysis for each gene using a Cox proportional hazards model,
@@ -668,6 +669,9 @@ perform_survival_analysis_with_permutation <- function(
     clinical_data_filtered,
     n_permutations = 1000
 ) {
+=======
+perform_survival_analysis_with_permutation <- function(count_matrix_filtered, gene_metadata_dt, clinical_data_filtered, n_permutations = 1000) {
+>>>>>>> 7633678ebafb876ed4b313c463b7f0caf11f23e4
   
   # Handle duplicate genes
   dup_genes <- gene_metadata_dt$gene_name[duplicated(gene_metadata_dt$gene_name)]
@@ -712,7 +716,11 @@ perform_survival_analysis_with_permutation <- function(
     
     # Observed Cox model
     cox_obs <- tryCatch({
+<<<<<<< HEAD
       survival::coxph(survival::Surv(overall_survival, deceased) ~ strata, data = merged_data)
+=======
+      coxph(Surv(overall_survival, deceased) ~ strata, data = merged_data)
+>>>>>>> 7633678ebafb876ed4b313c463b7f0caf11f23e4
     }, error = function(e) NULL)
     
     if (is.null(cox_obs)) next
@@ -729,7 +737,11 @@ perform_survival_analysis_with_permutation <- function(
       perm_data$overall_survival <- sample(perm_data$overall_survival)
       
       cox_perm <- tryCatch({
+<<<<<<< HEAD
         survival::coxph(survival::Surv(overall_survival, deceased) ~ strata, data = perm_data)
+=======
+        coxph(Surv(overall_survival, deceased) ~ strata, data = perm_data)
+>>>>>>> 7633678ebafb876ed4b313c463b7f0caf11f23e4
       }, error = function(e) NULL)
       
       perm_stats[i] <- if (!is.null(cox_perm)) summary(cox_perm)$logtest[1] else NA
@@ -752,6 +764,10 @@ perform_survival_analysis_with_permutation <- function(
   
   return(final_results)
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7633678ebafb876ed4b313c463b7f0caf11f23e4
 
 #' Plot Survival Analysis Results
 #'
