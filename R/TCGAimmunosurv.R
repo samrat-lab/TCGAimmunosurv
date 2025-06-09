@@ -635,6 +635,7 @@ perform_survival_analysis <- function(count_matrix_filtered, gene_metadata_dt, c
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #' Survival Analysis with Permutation Test for Robust Gene Selection
 #'
 #' This function performs survival analysis for each gene using a Cox proportional hazards model,
@@ -769,6 +770,8 @@ perform_survival_analysis_with_permutation <- function(count_matrix_filtered, ge
 
 >>>>>>> 7633678ebafb876ed4b313c463b7f0caf11f23e4
 
+=======
+>>>>>>> 7102884e2e691fd8c4486e47876a4be4f2d38b05
 #' Plot Survival Analysis Results
 #'
 #' This function generates three types of plots to visualize the survival analysis results:
