@@ -122,6 +122,8 @@ clinical_data_filtered<-processed_data$clinical_data_filtered
 #Perform Survival analysis
 survival_results <- perform_survival_analysis(count_matrix_filtered, gene_metadata_dt, clinical_data_filtered)
 
+survival_results_permutation <- perform_survival_analysis_with_permutation(count_matrix_filtered, gene_metadata_dt, clinical_data_filtered, n_permutations = 1000)
+
 #plot the Results
 plot_results(survival_results)
 
