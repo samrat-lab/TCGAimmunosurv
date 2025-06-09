@@ -662,12 +662,6 @@ perform_survival_analysis <- function(count_matrix_filtered, gene_metadata_dt, c
 #' @import data.table
 #' @importFrom survival Surv coxph
 #' @export
-perform_survival_analysis_with_permutation <- function(
-    count_matrix_filtered,
-    gene_metadata_dt,
-    clinical_data_filtered,
-    n_permutations = 1000
-) {
 
 perform_survival_analysis_with_permutation <- function(count_matrix_filtered, gene_metadata_dt, clinical_data_filtered, n_permutations = 1000) {
   
