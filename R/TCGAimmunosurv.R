@@ -634,6 +634,124 @@ perform_survival_analysis <- function(count_matrix_filtered, gene_metadata_dt, c
   return(results)
 }
 
+#' Survival Analysis with Permutation Test for Robust Gene Selection
+#'
+#' This function performs survival analysis for each gene using a Cox proportional hazards model,
+#' stratifies expression as HIGH/LOW per gene, and assesses robustness by performing a permutation test
+#' (random shuffling of survival labels) to estimate empirical p-values for each gene's association with survival.
+#'
+#' @param count_matrix_filtered A numeric matrix of gene expression (genes x samples) with gene IDs as rows and sample IDs as columns.
+#' @param gene_metadata_dt A data.table containing at least a column named `gene_name` corresponding to the genes in `count_matrix_filtered`.
+#' @param clinical_data_filtered A data.table with clinical data, including columns `submitter_id`, `overall_survival`, and `deceased`.
+#' @param n_permutations Number of permutations to perform for the permutation test (default: 1000).
+#'
+#'
+#' Genes are reported as significant if their empirical permutation p-value (`perm_pval`) is less than or equal to 0.05.
+#'
+#' @return
+#' A data.frame with one row per gene, containing:
+#'   \describe{
+#'     \item{gene_name}{Gene name}
+#'     \item{hazard_ratio}{Hazard ratio (HIGH vs LOW expression)}
+#'     \item{pvalue}{Wald p-value from the Cox model}
+#'     \item{logrank_stat}{Observed log-rank (likelihood ratio) statistic}
+#'     \item{perm_pval}{Empirical p-value from permutation test}
+#'     \item{significant}{"Yes" if perm_pval <= 0.05, otherwise "No"}
+#'   }
+#'
+#' @import data.table
+#' @importFrom survival Surv coxph
+#' @export
+perform_survival_analysis_with_permutation <- function(
+    count_matrix_filtered,
+    gene_metadata_dt,
+    clinical_data_filtered,
+    n_permutations = 1000
+) {
+  
+  # Handle duplicate genes
+  dup_genes <- gene_metadata_dt$gene_name[duplicated(gene_metadata_dt$gene_name)]
+  unique_dup_genes <- unique(dup_genes)
+  rows_to_keep <- integer(0)
+  for (gene in unique_dup_genes) {
+    gene_rows <- which(gene_metadata_dt$gene_name == gene)
+    mean_row <- colMeans(count_matrix_filtered[gene_rows, ], na.rm = TRUE)
+    count_matrix_filtered[gene_rows[1], ] <- mean_row
+    rows_to_keep <- c(rows_to_keep, gene_rows[1])
+  }
+  non_duplicate_rows <- which(!gene_metadata_dt$gene_name %in% unique_dup_genes)
+  final_rows_to_keep <- sort(c(rows_to_keep, non_duplicate_rows))
+  count_matrix_filtered <- count_matrix_filtered[final_rows_to_keep, ]
+  gene_metadata_dt <- gene_metadata_dt[final_rows_to_keep, ]
+  rownames(count_matrix_filtered) <- gene_metadata_dt$gene_name
+  
+  count_matrix_filtered_dt <- data.table::as.data.table(count_matrix_filtered, keep.rownames = "gene_name")
+  
+  # Stratify expression
+  strata_data <- melt(count_matrix_filtered_dt, id.vars = "gene_name", variable.name = "case_id", value.name = "counts")[
+    , strata := ifelse(counts >= median(counts, na.rm = TRUE), "HIGH", "LOW"), by = gene_name]
+  strata_data[, strata := factor(strata, levels = c("LOW", "HIGH"))]
+  
+  # Remove unstratifiable genes
+  single_strata_genes <- strata_data[, .N, by = .(gene_name, strata)][, .N, by = gene_name][N == 1]
+  strata_data <- strata_data[!gene_name %in% single_strata_genes$gene_name]
+  
+  # Merge with clinical
+  strata_data[, case_id := gsub("-01.*", "", case_id)]
+  clinical_data_filtered[, submitter_id := gsub("-01.*", "", submitter_id)]
+  setnames(clinical_data_filtered, old = c("submitter_id"), new = c("case_id"))
+  
+  results_list <- list()
+  gene_names <- unique(strata_data$gene_name)
+  
+  for (gene in gene_names) {
+    gene_data <- strata_data[gene_name == gene]
+    merged_data <- merge(gene_data, clinical_data_filtered, by = "case_id")
+    
+    if (length(unique(merged_data$strata)) < 2) next
+    
+    # Observed Cox model
+    cox_obs <- tryCatch({
+      survival::coxph(survival::Surv(overall_survival, deceased) ~ strata, data = merged_data)
+    }, error = function(e) NULL)
+    
+    if (is.null(cox_obs)) next
+    
+    obs_lr <- summary(cox_obs)$logtest[1]  # Chi-square log-rank stat
+    hr <- exp(coef(cox_obs))
+    pval <- summary(cox_obs)$coef["strataHIGH", "Pr(>|z|)"]
+    
+    # Permutation test
+    perm_stats <- numeric(n_permutations)
+    for (i in seq_len(n_permutations)) {
+      perm_data <- merged_data
+      perm_data$deceased <- sample(perm_data$deceased)
+      perm_data$overall_survival <- sample(perm_data$overall_survival)
+      
+      cox_perm <- tryCatch({
+        survival::coxph(survival::Surv(overall_survival, deceased) ~ strata, data = perm_data)
+      }, error = function(e) NULL)
+      
+      perm_stats[i] <- if (!is.null(cox_perm)) summary(cox_perm)$logtest[1] else NA
+    }
+    
+    perm_stats <- perm_stats[!is.na(perm_stats)]
+    perm_pval <- mean(perm_stats >= obs_lr)
+    
+    results_list[[gene]] <- data.frame(
+      gene_name = gene,
+      hazard_ratio = hr,
+      pvalue = pval,
+      logrank_stat = obs_lr,
+      perm_pval = perm_pval
+    )
+  }
+  
+  final_results <- do.call(rbind, results_list)
+  final_results$significant <- ifelse(final_results$perm_pval <= 0.05, "Yes", "No")
+  
+  return(final_results)
+}
 
 #' Plot Survival Analysis Results
 #'
